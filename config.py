@@ -7,10 +7,10 @@ AD_CONFIG = {
     'host': '192.168.11.5',
     'port': 389,
     'use_ssl': False,
-    # 格式：使用UPN格式 administrator@archmond.ltd 或完整DN格式 CN=Administrator,CN=Users,DC=archmond,DC=ltd
+    # 格式：使用UPN格式 administrator@archmond.ltd 或完整DN格式 CN=Administrator,CN=Users,DC=******,DC=ltd
     'user_dn': 'CN=Administrator,CN=Users,DC=archmond,DC=ltd',
-    'password': 'Gibbs001!',
-    'base_dn': 'DC=archmond,DC=ltd',
+    'password': '******',
+    'base_dn': 'DC=******,DC=ltd',
 }
 
 # PVE配置
@@ -18,7 +18,7 @@ PVE_CONFIG = {
     'host': '192.168.11.13',
     'port': 8006,
     'user': 'root@pam',  # 使用 root@pam 进行认证
-    'password': 'Gibbs001!',
+    'password': '******',
     'verify_ssl': False,
 }
 
@@ -27,8 +27,8 @@ HORIZON_CONFIG = {
     'host': '192.168.11.6',
     'port': 443,
     'user': 'administrator',
-    'password': 'Gibbs001!',
-    'domain': 'archmond.ltd',
+    'password': '******',
+    'domain': '******.com',
 }
 
 # Flask配置
