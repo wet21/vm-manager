@@ -72,7 +72,7 @@ class PVEClient:
             logger.error(f"PVE登录异常：{e}")
             return False
 
-    def get_vms(self):
+    def get_vms(self, retry=True):
         """获取所有虚机列表"""
         if not self.ticket:
             self.login()
@@ -101,13 +101,20 @@ class PVEClient:
                     })
                 logger.info(f"获取到 {len(vms)} 个虚机")
                 return vms
+            elif response.status_code == 401 and retry:
+                # Ticket过期，重新登录并重试
+                logger.warning("PVE认证票据过期，重新登录...")
+                self.ticket = None
+                self.csrf_token = None
+                if self.login():
+                    return self.get_vms(retry=False)
             logger.warning(f"获取虚机列表失败：状态码 {response.status_code}")
             return []
         except Exception as e:
             logger.error(f"获取虚机列表异常：{e}")
             return []
 
-    def get_vm_status(self, vmid):
+    def get_vm_status(self, vmid, retry=True):
         """获取指定虚机的详细状态"""
         if not self.ticket:
             self.login()
@@ -139,18 +146,26 @@ class PVEClient:
                         'balloon': data.get('balloon'),
                         'cpu_count': data.get('cpus'),
                     }
+            elif response.status_code == 401 and retry:
+                # Ticket过期，重新登录并重试
+                logger.warning(f"PVE认证票据过期，重新登录... (vmid={vmid})")
+                self.ticket = None
+                self.csrf_token = None
+                if self.login():
+                    return self.get_vm_status(vmid, retry=False)
             return None
         except Exception as e:
             logger.error(f"获取虚机 {vmid} 状态异常：{e}")
             return None
 
-    def vm_action(self, vmid, action):
+    def vm_action(self, vmid, action, retry=True):
         """
         对虚机执行操作
 
         Args:
             vmid: 虚机ID
             action: 操作类型 (start/stop/shutdown/reboot/reset)
+            retry: 是否在401时重试
 
         Returns:
             dict: {'success': True/False, 'message': '...'}
@@ -179,6 +194,13 @@ class PVEClient:
             if response.status_code in [200, 201]:
                 logger.info(f"虚机 {vmid} 执行 {action} 成功")
                 return {'success': True, 'message': f'操作 {action} 执行成功'}
+            elif response.status_code == 401 and retry:
+                # Ticket过期，重新登录并重试
+                logger.warning(f"PVE认证票据过期，重新登录... (vmid={vmid}, action={action})")
+                self.ticket = None
+                self.csrf_token = None
+                if self.login():
+                    return self.vm_action(vmid, action, retry=False)
             else:
                 error_msg = response.text
                 logger.warning(f"虚机 {vmid} 执行 {action} 失败：{error_msg}")
@@ -187,7 +209,7 @@ class PVEClient:
             logger.error(f"虚机 {vmid} 执行 {action} 异常：{e}")
             return {'success': False, 'message': f'操作异常：{str(e)}'}
 
-    def get_vm_config(self, vmid):
+    def get_vm_config(self, vmid, retry=True):
         """获取虚机配置信息"""
         if not self.ticket:
             self.login()
@@ -201,6 +223,13 @@ class PVEClient:
                 result = response.json()
                 if 'data' in result:
                     return {'success': True, 'config': result['data']}
+            elif response.status_code == 401 and retry:
+                # Ticket过期，重新登录并重试
+                logger.warning(f"PVE认证票据过期，重新登录... (vmid={vmid})")
+                self.ticket = None
+                self.csrf_token = None
+                if self.login():
+                    return self.get_vm_config(vmid, retry=False)
             return {'success': False, 'message': '获取配置失败'}
         except Exception as e:
             logger.error(f"获取虚机 {vmid} 配置异常：{e}")
