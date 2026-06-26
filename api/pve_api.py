@@ -34,6 +34,10 @@ class PVEClient:
         if self.ticket:
             headers['Cookie'] = f'PVEAuthCookie={self.ticket}'
 
+        # 对于POST请求，添加CSRF Token
+        if method == 'POST' and self.csrf_token:
+            headers['CSRFPreventionToken'] = self.csrf_token
+
         try:
             response = requests.request(
                 method=method,
