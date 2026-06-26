@@ -250,7 +250,7 @@ def api_get_pve_vms():
                 'qmpstatus': vm.get('qmpstatus', 'unknown'),
                 'cpu': {
                     'usage': round(vm.get('cpu', 0) * 100, 2),
-                    'count': vm.get('maxcpu', 1),
+                    'count': vm.get('cpus', 1),
                 },
                 'memory': {
                     'used': format_bytes(vm.get('mem')),

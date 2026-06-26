@@ -94,7 +94,7 @@ class PVEClient:
                         'name': vm.get('name'),
                         'status': vm.get('status'),
                         'cpu': vm.get('cpu'),
-                        'maxcpu': vm.get('maxcpu'),
+                        'cpus': vm.get('cpus'),
                         'mem': vm.get('mem'),
                         'maxmem': vm.get('maxmem'),
                         'disk': vm.get('disk'),
